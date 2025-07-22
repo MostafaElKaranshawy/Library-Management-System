@@ -1,9 +1,12 @@
 package Models;
 
+import Interfaces.Borrowable;
 import Interfaces.Identifiable;
 import Interfaces.Nameable;
+import ch.qos.logback.core.encoder.JsonEscapeUtil;
+import org.w3c.dom.ls.LSOutput;
 
-public class Book implements Identifiable, Nameable {
+public class Book implements Identifiable, Nameable, Borrowable {
     private int id;
     private String title;
     private String author;
@@ -50,5 +53,23 @@ public class Book implements Identifiable, Nameable {
 
     public void setAvailableCopies(int availableCopies) {
         this.availableCopies = availableCopies;
+    }
+
+    @Override
+    public void borrowBook() {
+        if (availableCopies > 0) {
+            availableCopies--;
+        } else {
+            throw new RuntimeException("No copies available for borrowing");
+        }
+    }
+
+    @Override
+    public void returnBook() {
+        if (availableCopies >= 0) {
+            availableCopies++;
+        } else {
+            throw new RuntimeException("Cannot return book, no copies were borrowed");
+        }
     }
 }
