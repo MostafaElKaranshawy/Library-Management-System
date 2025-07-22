@@ -7,40 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Identifiable, Nameable {
-    private int id;
+    private String id;
     private String name;
-    private String email;
-    private String password;
+    private String role;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public User(){}
 
-    public User(String name, String email, String password) {
+    public User(String id, String name, String role) {
+        this.id = id;
         this.name = name;
-        this.email = email;
-        this.password = password;
+        this.role = role;
     }
 
-    public String getEmail() {
-        return email;
-    }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -52,4 +44,24 @@ public class User implements Identifiable, Nameable {
         this.name = name;
     }
 
+    // for admin polymorphism
+    public String getPassword() { return null; }
+
+    public void setPassword(String password) {}
+
+    // for user polymorphism
+    public List<Book> getBorrowedBooks() { return null; }
+
+    public void borrowBook(Book book) {}
+
+    public void returnBook(Book book) {}
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", role='" + role + '\'' +
+                '}';
+    }
 }

@@ -8,9 +8,9 @@ import java.util.List;
 
 public class SearchService<T> {
 
-    public T searchById(int id, List<T> items) {
+    public T searchById(String id, List<T> items) {
         for (T item : items) {
-            if (item instanceof Identifiable && ((Identifiable) item).getId() == id) {
+            if (item instanceof Identifiable && ((Identifiable) item).getId().equals(id)) {
                 return item;
             }
         }

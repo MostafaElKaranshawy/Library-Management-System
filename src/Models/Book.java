@@ -6,20 +6,30 @@ import Interfaces.Nameable;
 import ch.qos.logback.core.encoder.JsonEscapeUtil;
 import org.w3c.dom.ls.LSOutput;
 
+import java.time.LocalDate;
+
 public class Book implements Identifiable, Nameable, Borrowable {
-    private int id;
+    private String id;
     private String title;
     private String author;
     private String genre;
     private int availableCopies;
 
-    public int getId() {
+    public Book(String id, String title, String author, String genre, int availableCopies) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.genre = genre;
+        this.availableCopies = availableCopies;
+    }
+
+    public String getId() {
         return id;
     }
     public String getName() {
         return title;
     }
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -71,5 +81,17 @@ public class Book implements Identifiable, Nameable, Borrowable {
         } else {
             throw new RuntimeException("Cannot return book, no copies were borrowed");
         }
+    }
+
+    @Override
+    public String
+    toString() {
+        return "Book{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                ", genre='" + genre + '\'' +
+                ", availableCopies=" + availableCopies +
+                '}';
     }
 }

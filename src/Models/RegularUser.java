@@ -17,12 +17,18 @@ public class RegularUser extends User {
         super();
         borrowedBooks = new ArrayList<Book>();
     }
-    public RegularUser(String name, String email, String password, String address, String phoneNumber) {
-        super(name, email, password);
+    public RegularUser(String id, String name, String address, String phoneNumber) {
+        super(id, name, "Regular User");
         this.address = address;
         this.phoneNumber = phoneNumber;
     }
 
+    @Override
+    public List<Book> getBorrowedBooks() {
+        return borrowedBooks;
+    }
+
+    @Override
     public void borrowBook(Book book) {
         if (userBooksSearchService.searchById(book.getId(), borrowedBooks) != null)
             throw new RuntimeException("Book already borrowed");
@@ -30,6 +36,7 @@ public class RegularUser extends User {
         borrowedBooks.add(book);
     }
 
+    @Override
     public void returnBook(Book book) {
         if (userBooksSearchService.searchById(book.getId(), borrowedBooks) != null)
             borrowedBooks.remove(book);
