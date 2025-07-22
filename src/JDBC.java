@@ -21,7 +21,7 @@ public class JDBC {
                 System.out.println("Failed to make connection!");
             }
         } catch (SQLException e) {
-            System.out.println("Connection failed: " + e.getMessage());
+            throw new SQLException("Connection failed: " + e.getMessage(), e);
         }
     }
     public static void close() throws SQLException {
