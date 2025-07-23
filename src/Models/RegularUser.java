@@ -31,19 +31,25 @@ public class RegularUser extends User {
 
     @Override
     public void borrowBook(Book book) {
-        System.out.println(this.borrowedBooks);
         if (userBooksSearchService.searchById(book.getId(), this.borrowedBooks) != null)
             throw new RuntimeException("Book already borrowed");
 
+        if (this.borrowedBooks.size() >= 5)
+            throw new RuntimeException("Cannot borrow more than 5 books at a time");
         this.borrowedBooks.add(book);
     }
 
     @Override
     public void returnBook(Book book) {
-        if (userBooksSearchService.searchById(book.getId(), this.borrowedBooks) != null)
-            this.borrowedBooks.remove(book);
+        if (userBooksSearchService.searchById(book.getId(), this.borrowedBooks) != null) {
+            this.borrowedBooks.removeIf(b -> b.getId().equals(book.getId()));
+        }
         else
             throw new RuntimeException("Book not found in borrowed list");
 
+    }
+
+    public void setBorrowedBooks(List<Book> borrowedBooks) {
+        this.borrowedBooks = borrowedBooks;
     }
 }

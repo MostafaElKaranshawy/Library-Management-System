@@ -3,10 +3,6 @@ package Models;
 import Interfaces.Borrowable;
 import Interfaces.Identifiable;
 import Interfaces.Nameable;
-import ch.qos.logback.core.encoder.JsonEscapeUtil;
-import org.w3c.dom.ls.LSOutput;
-
-import java.time.LocalDate;
 
 public class Book implements Identifiable, Nameable, Borrowable {
     private String id;

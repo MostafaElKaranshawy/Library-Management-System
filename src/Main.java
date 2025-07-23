@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
         while (true) {
             System.out.println("\n===== Welcome to the Library System =====");
             System.out.println("1. Admin Login");
@@ -133,6 +132,19 @@ public class Main {
                     break;
 
                 case "6":
+                    List<Book> curBooks = SystemService.getAllBooks();
+                    System.out.printf("%-10s %-30s %-20s %-15s %-10s%n", "ID", "Title", "Author", "Genre", "Copies");
+                    System.out.println("--------------------------------------------------------------------------------------");
+
+                    for (Book b : curBooks) {
+                        System.out.printf("%-10s %-30s %-20s %-15s %-10d%n",
+                                crop(b.getId(), 10),
+                                crop(b.getTitle(), 30),
+                                crop(b.getAuthor(), 20),
+                                crop(b.getGenre(), 15),
+                                b.getAvailableCopies()
+                        );
+                    }
                     System.out.print("Book ID to update: ");
                     String bookId = scanner.nextLine();
                     try {
@@ -159,7 +171,16 @@ public class Main {
                     System.out.print("New genre: ");
                     String newGenre = scanner.nextLine();
                     System.out.print("New copies: ");
-                    int newCopies = Integer.parseInt(scanner.nextLine());
+                    String nCopies = scanner.nextLine();
+                    int newCopies = -1;
+                    if(!nCopies.isEmpty()) {
+                        try {
+                            newCopies = Integer.parseInt(nCopies);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid number of copies. Keeping previous value.");
+                        }
+                    }
+
                     SystemService.updateBook(bookId, newTitle, newAuthor, newGenre, newCopies);
                     System.out.println("Book updated.");
                     break;
