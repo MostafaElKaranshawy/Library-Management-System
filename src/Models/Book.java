@@ -4,7 +4,9 @@ import Interfaces.Borrowable;
 import Interfaces.Identifiable;
 import Interfaces.Nameable;
 
-public class Book implements Identifiable, Nameable, Borrowable {
+import java.io.Serializable;
+
+public class Book implements Identifiable, Nameable, Borrowable, Serializable {
     private String id;
     private String title;
     private String author;

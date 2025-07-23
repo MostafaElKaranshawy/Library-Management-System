@@ -5,10 +5,6 @@ import Models.Book;
 import Models.RegularUser;
 import Models.User;
 import org.mindrot.jbcrypt.BCrypt;
-import Services.BooksService;
-import Services.SearchService;
-
-import javax.management.InstanceNotFoundException;
 import java.util.*;
 
 
@@ -20,7 +16,26 @@ public class SystemService {
     static {
         // Initialize the users map and services
         users = new HashMap<>();
-        fetchUsers();
+        if(ConfigService.useFileStorage())
+            fetchUsersFromFile();
+        else
+            fetchUsers();
+    }
+    private static void fetchUsersFromFile() {
+        try {
+            List<Admin> admins = FileService.getAllAdmins();
+            List<RegularUser> regularUsers = FileService.getAllRegularUsers();
+            for (Admin admin : admins) {
+                users.put(admin.getId(), admin);
+            }
+            for (RegularUser user : regularUsers) {
+                List<Book> borrowedBooks = FileService.getBorrowedBooks(user.getId());
+                user.setBorrowedBooks(borrowedBooks);
+                users.put(user.getId(), user);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
     private static void fetchUsers() {
         try {
@@ -57,7 +72,10 @@ public class SystemService {
 
             RegularUser newUser = new RegularUser(id, name, address, phoneNumber);
             users.put(id, newUser);
-            DBService.addUser(newUser);
+            if(ConfigService.useFileStorage())
+                FileService.addUser(newUser);
+            else
+                DBService.addUser(newUser);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
