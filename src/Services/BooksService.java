@@ -22,17 +22,12 @@ public class BooksService {
 
         // Add some initial books
         try {
+            List<Book> initialBooks = DBService.getAllBooks();
+            for (Book book : initialBooks) {
+                books.put(book.getId(), book);
+                genres.add(book.getGenre());
+            }
 
-            addBook("To Kill a Mockingbird", "Harper Lee", "Classic", 5);
-            addBook("1984", "George Orwell", "Dystopian", 4);
-            addBook("Pride and Prejudice", "Jane Austen", "Romance", 3);
-            addBook("The Great Gatsby", "F. Scott Fitzgerald", "Classic", 2);
-            addBook("The Hobbit", "J.R.R. Tolkien", "Fantasy", 6);
-            addBook("Harry Potter and the Sorcerer's Stone", "J.K. Rowling", "Fantasy", 10);
-            addBook("A Brief History of Time", "Stephen Hawking", "Science", 4);
-            addBook("The Art of War", "Sun Tzu", "Philosophy", 3);
-            addBook("The Catcher in the Rye", "J.D. Salinger", "Classic", 2);
-            addBook("The Alchemist", "Paulo Coelho", "Adventure", 5);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -50,6 +45,7 @@ public class BooksService {
             } while (books.containsKey(id));
             Book book = new Book(id, title, author, genre, copies);
             books.put(id, book);
+            DBService.addBook(book);
         }
         catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -59,6 +55,11 @@ public class BooksService {
     public static void removeBook(String id) {
         if (books.containsKey(id)) {
             books.remove(id);
+            try {
+                DBService.deleteBook(id);
+            } catch (Exception e) {
+                throw new RuntimeException("Error removing book from database: " + e.getMessage());
+            }
         } else {
             throw new RuntimeException("Book not found");
         }
@@ -66,6 +67,11 @@ public class BooksService {
     public static void updateBook(Book book) {
         if (books.containsKey(book.getId())) {
             books.put(book.getId(), book);
+            try {
+                DBService.updateBook(book);
+            } catch (Exception e) {
+                throw new RuntimeException("Error updating book in database: " + e.getMessage());
+            }
         } else {
             throw new RuntimeException("Book not found");
         }
@@ -79,6 +85,7 @@ public class BooksService {
             try {
                 user.borrowBook(book);
                 book.borrowBook();
+                DBService.borrowBook(user.getId(), bookId);
                 return book;
             }
             catch (Exception e) {
@@ -90,18 +97,32 @@ public class BooksService {
         }
     }
 
-    public static void returnBook(String bookId, RegularUser user) throws InstanceNotFoundException {
+    public static void returnBook(String bookId, RegularUser user) {
         List<Book> availableBooks = new ArrayList<>(books.values());
         Book book = bookSearchService.searchById(bookId, availableBooks);
         if (book != null) {
             try {
                 user.returnBook(book);
                 book.returnBook();
+                DBService.returnBook(user.getId(), bookId);
+                DBService.updateBook(book);
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage());
             }
         } else {
-            throw new InstanceNotFoundException("Book not found in borrowed list");
+            Book newBook = bookSearchService.searchById(bookId, user.getBorrowedBooks());
+            if (newBook == null) {
+                throw new RuntimeException("Book not found in borrowed list");
+            } else {
+                try {
+                    BooksService.addBook(newBook.getTitle(), newBook.getAuthor(), newBook.getGenre(), 1);
+                    DBService.returnBook(user.getId(), bookId);
+                    DBService.addBook(newBook);
+                }
+                catch (Exception e1) {
+                    throw new RuntimeException("Book not found in the system");
+                }
+            }
         }
     }
 

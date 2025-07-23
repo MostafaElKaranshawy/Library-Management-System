@@ -20,22 +20,24 @@ public class SystemService {
     static {
         // Initialize the users map and services
         users = new HashMap<>();
-        String adminPass1 = BCrypt.hashpw("admin123", BCrypt.gensalt());
-        String adminPass2 = BCrypt.hashpw("secure456", BCrypt.gensalt());
-
-        Admin admin1 = new Admin("admin001", "Alice", adminPass1);
-        Admin admin2 = new Admin("admin002", "Bob", adminPass2);
-
-        users.put(admin1.getId(), admin1);
-        users.put(admin2.getId(), admin2);
-        
-        RegularUser user1 = new RegularUser("user001", "Charlie", "123 Elm Street", "01012345678");
-        RegularUser user2 = new RegularUser("user002", "Diana", "456 Oak Avenue", "01087654321");
-        RegularUser user3 = new RegularUser("user003", "Ethan", "789 Pine Road", "01099887766");
-
-        users.put(user1.getId(), user1);
-        users.put(user2.getId(), user2);
-        users.put(user3.getId(), user3);
+        fetchUsers();
+    }
+    private static void fetchUsers() {
+        try {
+            List<Admin> admins = DBService.getAllAdmins();
+            List<RegularUser> regularUsers = DBService.getAllRegularUsers();
+            for (Admin admin : admins) {
+                users.put(admin.getId(), admin);
+            }
+            for (RegularUser user : regularUsers) {
+                List<Book> borrowedBooks = DBService.getBorrowedBooks(user.getId());
+                user.setBorrowedBooks(borrowedBooks);
+                users.put(user.getId(), user);
+            }
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
     public static Admin login(String id, String password) {
         Admin user = (Admin)users.get(id);
@@ -55,6 +57,7 @@ public class SystemService {
 
             RegularUser newUser = new RegularUser(id, name, address, phoneNumber);
             users.put(id, newUser);
+            DBService.addUser(newUser);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -99,7 +102,8 @@ public class SystemService {
             existingBook.setAuthor(newAuthor);
         if(newGenre != null && !newGenre.isEmpty())
             existingBook.setGenre(newGenre);
-        existingBook.setAvailableCopies(newCopies);
+        if(newCopies  >= 0)
+            existingBook.setAvailableCopies(newCopies);
         try {
             BooksService.updateBook(existingBook);
         }
@@ -130,18 +134,6 @@ public class SystemService {
         }
         try {
             BooksService.returnBook(bookId, user);
-        } catch (InstanceNotFoundException e) {
-            Book book = bookSearchService.searchById(bookId, user.getBorrowedBooks());
-            if (book == null) {
-                throw new RuntimeException("Book not found in borrowed list");
-            } else {
-                try {
-                    BooksService.addBook(book.getTitle(), book.getAuthor(), book.getGenre(), 1);
-                }
-                catch (Exception e1) {
-                    throw new RuntimeException("Book not found in the system");
-                }
-            }
         }
         catch (Exception e) {
             throw new RuntimeException(e.getMessage());
