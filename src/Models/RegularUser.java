@@ -9,13 +9,14 @@ import java.util.List;
 public class RegularUser extends User {
     String address;
     String phoneNumber;
-    List<Book> borrowedBooks;
+    List<Book> borrowedBooks = new ArrayList<>();
 
-    private SearchService<Book> userBooksSearchService;
+    private SearchService<Book> userBooksSearchService = new SearchService<>();
 
     public RegularUser() {
         super();
         borrowedBooks = new ArrayList<Book>();
+        userBooksSearchService = new SearchService<Book>();
     }
     public RegularUser(String id, String name, String address, String phoneNumber) {
         super(id, name, "Regular User");
@@ -30,16 +31,17 @@ public class RegularUser extends User {
 
     @Override
     public void borrowBook(Book book) {
-        if (userBooksSearchService.searchById(book.getId(), borrowedBooks) != null)
+        System.out.println(this.borrowedBooks);
+        if (userBooksSearchService.searchById(book.getId(), this.borrowedBooks) != null)
             throw new RuntimeException("Book already borrowed");
 
-        borrowedBooks.add(book);
+        this.borrowedBooks.add(book);
     }
 
     @Override
     public void returnBook(Book book) {
-        if (userBooksSearchService.searchById(book.getId(), borrowedBooks) != null)
-            borrowedBooks.remove(book);
+        if (userBooksSearchService.searchById(book.getId(), this.borrowedBooks) != null)
+            this.borrowedBooks.remove(book);
         else
             throw new RuntimeException("Book not found in borrowed list");
 

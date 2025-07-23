@@ -27,7 +27,8 @@ public class Main {
                     String password = scanner.nextLine();
 
                     try {
-                        SystemService.login(id, password);
+                        Admin admin = SystemService.login(id, password);
+                        System.out.println("Welcome, " + admin.getName() + "!");
                         showAdminMenu(scanner);
                     } catch (RuntimeException e) {
                         System.out.println("Login failed: " + e.getMessage());
@@ -58,8 +59,6 @@ public class Main {
             System.out.println("5. Remove book");
             System.out.println("6. Update book");
             System.out.println("7. View all books");
-            System.out.println("8. Borrow book for user");
-            System.out.println("9. Return book for user");
             System.out.println("0. Logout");
             System.out.print("Enter choice: ");
             String choice = scanner.nextLine();
@@ -76,9 +75,6 @@ public class Main {
                                 crop(user.getName(), 15),
                                 crop(user.getRole(), 10));
                     });
-
-
-
                     break;
 
                 case "2":
@@ -117,6 +113,19 @@ public class Main {
                     break;
 
                 case "5":
+                    List<Book> curbBooks = SystemService.getAllBooks();
+                    System.out.printf("%-10s %-30s %-20s %-15s %-10s%n", "ID", "Title", "Author", "Genre", "Copies");
+                    System.out.println("--------------------------------------------------------------------------------------");
+
+                    for (Book b : curbBooks) {
+                        System.out.printf("%-10s %-30s %-20s %-15s %-10d%n",
+                                crop(b.getId(), 10),
+                                crop(b.getTitle(), 30),
+                                crop(b.getAuthor(), 20),
+                                crop(b.getGenre(), 15),
+                                b.getAvailableCopies()
+                        );
+                    }
                     System.out.print("Book ID to remove: ");
                     String removeId = scanner.nextLine();
                     SystemService.removeBook(removeId);
@@ -126,6 +135,23 @@ public class Main {
                 case "6":
                     System.out.print("Book ID to update: ");
                     String bookId = scanner.nextLine();
+                    try {
+                        Book previousBook = SystemService.getBookById(bookId);
+                        System.out.println("Current details");
+                        System.out.printf("%-10s %-30s %-20s %-15s %-10s%n", "ID", "Title", "Author", "Genre", "Copies");
+                        System.out.printf("%-10s %-30s %-20s %-15s %-10d%n",
+                                crop(previousBook.getId(), 10),
+                                crop(previousBook.getTitle(), 30),
+                                crop(previousBook.getAuthor(), 20),
+                                crop(previousBook.getGenre(), 15),
+                                previousBook.getAvailableCopies()
+                        );
+                    }
+                    catch (Exception e) {
+                        System.out.println("Book not found: " + e.getMessage());
+                        continue;
+                    }
+
                     System.out.print("New title: ");
                     String newTitle = scanner.nextLine();
                     System.out.print("New author: ");
@@ -154,33 +180,6 @@ public class Main {
                     }
 
                     break;
-
-                case "8":
-                    System.out.print("Book ID: ");
-                    String borrowBookId = scanner.nextLine();
-                    System.out.print("User ID: ");
-                    String borrowUserId = scanner.nextLine();
-                    try {
-                        Book borrowed = SystemService.borrowBook(borrowBookId, borrowUserId);
-                        System.out.println("Book borrowed: " + borrowed.toString());
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-                    break;
-
-                case "9":
-                    System.out.print("Book ID: ");
-                    String returnBookId = scanner.nextLine();
-                    System.out.print("User ID: ");
-                    String returnUserId = scanner.nextLine();
-                    try {
-                        SystemService.returnBook(returnBookId, returnUserId);
-                        System.out.println("Book returned.");
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-                    break;
-
                 case "0":
                     System.out.println("Logging out...");
                     return;
@@ -242,13 +241,16 @@ public class Main {
 
 
 
-                        System.out.print("\nEnter Book ID to borrow: ");
+                        System.out.print("\nEnter Book ID to borrow:  (or no to cancel) ");
                         String bookId = scanner.nextLine();
+                        if(bookId.equals("no")){
+                            break;
+                        }
                         try {
                             Book borrowed = SystemService.borrowBook(bookId, userId);
                             System.out.println("Borrowed successfully: " + borrowed.getTitle());
                         } catch (Exception e) {
-                            System.out.println("Error: " + e.getMessage());
+                            System.out.println(e.getMessage());
                         }
                     }
                     break;
@@ -259,26 +261,28 @@ public class Main {
                         System.out.println("You have no borrowed books.");
                     } else {
                         System.out.println("Your Borrowed Books:");
-                        System.out.printf("%-10s %-25s %-20s %-15s %-10s%n", "ID", "Title", "Author", "Genre", "Copies");
+                        System.out.printf("%-10s %-25s %-20s %-15s %n", "ID", "Title", "Author", "Genre");
                         System.out.println("--------------------------------------------------------------------------------------");
 
                         for (Book b : borrowedBooks) {
-                            System.out.printf("%-10s %-25s %-20s %-15s %-10d%n",
+                            System.out.printf("%-10s %-25s %-20s %-15s %n",
                                     crop(b.getId(), 10),
                                     crop(b.getTitle(), 25),
                                     crop(b.getAuthor(),20),
-                                    crop(b.getGenre(), 15),
-                                    b.getAvailableCopies()
+                                    crop(b.getGenre(), 15)
                             );
                         }
 
-                        System.out.print("Enter Book ID to return: ");
+                        System.out.print("Enter Book ID to return:   (or no to cancel) ");
                         String returnId = scanner.nextLine();
+                        if (returnId.equals("no")) {
+                            break;
+                        }
                         try {
                             SystemService.returnBook(returnId, userId);
                             System.out.println("Book returned successfully.");
                         } catch (Exception e) {
-                            System.out.println("Error: " + e.getMessage());
+                            System.out.println(e.getMessage());
                         }
                     }
                     break;

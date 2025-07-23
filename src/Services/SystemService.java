@@ -5,21 +5,21 @@ import Models.Book;
 import Models.RegularUser;
 import Models.User;
 import org.mindrot.jbcrypt.BCrypt;
+import Services.BooksService;
+import Services.SearchService;
 
+import javax.management.InstanceNotFoundException;
 import java.util.*;
 
 
 public class SystemService {
-    // name, user.
-    static Map<String, User> users;
-    static private SearchService<User> userSearchService;
-    static private BooksService booksService;
 
+    static Map<String, User> users;
+    static SearchService<User> userSearchService = new SearchService<>();
+    static SearchService<Book> bookSearchService = new SearchService<>();
     static {
         // Initialize the users map and services
         users = new HashMap<>();
-        booksService = new BooksService();
-        userSearchService = new SearchService<>();
         String adminPass1 = BCrypt.hashpw("admin123", BCrypt.gensalt());
         String adminPass2 = BCrypt.hashpw("secure456", BCrypt.gensalt());
 
@@ -37,14 +37,11 @@ public class SystemService {
         users.put(user2.getId(), user2);
         users.put(user3.getId(), user3);
     }
-    public static void login(String id, String password) {
+    public static Admin login(String id, String password) {
         Admin user = (Admin)users.get(id);
 
-        System.out.println("Attempting login for user: " + id);
-        System.out.println("Password provided: " + password);
-
         if (user != null && BCrypt.checkpw(password, user.getPassword())) {
-            System.out.println("Login successful for user: " + user.getName());
+            return user;
         } else {
             throw new RuntimeException("Invalid email or password");
         }
@@ -60,7 +57,7 @@ public class SystemService {
             users.put(id, newUser);
         }
         catch (Exception e) {
-            System.out.println("Error while registering new user: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
@@ -77,10 +74,10 @@ public class SystemService {
     // Admin book management methods
     public static void addBook(String title, String author, String genre, int copies) {
         try {
-            booksService.addBook(title, author, genre, copies);
+            BooksService.addBook(title, author, genre, copies);
         }
         catch (Exception e) {
-            throw new RuntimeException("Error while adding book: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
     public static void removeBook(String bookId) {
@@ -88,20 +85,26 @@ public class SystemService {
             throw new RuntimeException("Book ID cannot be null or empty");
         }
         try {
-            booksService.removeBook(bookId);
+            BooksService.removeBook(bookId);
         }
         catch (Exception e) {
-            throw new RuntimeException("Error while removing book: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
     public static void updateBook(String bookId, String newTitle, String newAuthor, String newGenre, int newCopies) {
-
-        Book book = new Book(bookId, newTitle, newAuthor, newGenre, newCopies);
+        Book existingBook = BooksService.getBookById(bookId);
+        if(newTitle != null && !newTitle.isEmpty())
+            existingBook.setTitle(newTitle);
+        if(newAuthor != null && !newAuthor.isEmpty())
+            existingBook.setAuthor(newAuthor);
+        if(newGenre != null && !newGenre.isEmpty())
+            existingBook.setGenre(newGenre);
+        existingBook.setAvailableCopies(newCopies);
         try {
-            booksService.updateBook(book);
+            BooksService.updateBook(existingBook);
         }
         catch (Exception e) {
-            throw new RuntimeException("Error while updating book: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
     public static Book borrowBook(String bookId, String userId) {
@@ -112,13 +115,13 @@ public class SystemService {
             throw new RuntimeException("Book ID cannot be null or empty");
         }
         try {
-            return booksService.borrowBook(bookId, user);
+            return BooksService.borrowBook(bookId, user);
         } catch (Exception e) {
-            throw new RuntimeException("Error while borrowing book: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public static void returnBook(String bookId, String userId) {
+    public static void returnBook(String bookId, String userId) throws Exception {
         RegularUser user = (RegularUser)userSearchService.searchById(
             userId, new ArrayList<>(users.values())
         );
@@ -126,13 +129,32 @@ public class SystemService {
             throw new RuntimeException("Book ID cannot be null or empty");
         }
         try {
-            booksService.returnBook(bookId, user);
-        } catch (Exception e) {
-            throw new RuntimeException("Error while returning book: " + e.getMessage());
+            BooksService.returnBook(bookId, user);
+        } catch (InstanceNotFoundException e) {
+            Book book = bookSearchService.searchById(bookId, user.getBorrowedBooks());
+            if (book == null) {
+                throw new RuntimeException("Book not found in borrowed list");
+            } else {
+                try {
+                    BooksService.addBook(book.getTitle(), book.getAuthor(), book.getGenre(), 1);
+                }
+                catch (Exception e1) {
+                    throw new RuntimeException("Book not found in the system");
+                }
+            }
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     public static List<Book> getAllBooks() {
-        return booksService.getAvailableBooks();
+        return BooksService.getAvailableBooks();
+    }
+    public static Book getBookById(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new RuntimeException("Book ID cannot be null or empty");
+        }
+        return BooksService.getBookById(id);
     }
 }
