@@ -12,7 +12,7 @@ public class ConfigService {
         try (FileInputStream fis = new FileInputStream(CONFIG_FILE)) {
             Properties props = new Properties();
             props.load(fis);
-            storageType = props.getProperty("storage", "FILE").toUpperCase();
+            storageType = props.getProperty("STORAGE_TYPE", "FILE").toUpperCase();
         } catch (IOException e) {
             storageType = "DATABASE"; // fallback default
         }

@@ -16,6 +16,8 @@ public class SystemService {
     static {
         // Initialize the users map and services
         users = new HashMap<>();
+
+        System.out.println(ConfigService.useFileStorage() + "  " + ConfigService.useDatabaseStorage());
         if(ConfigService.useFileStorage())
             fetchUsersFromFile();
         else
