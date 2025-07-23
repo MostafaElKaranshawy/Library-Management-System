@@ -226,6 +226,7 @@ public class Main {
             return;
         }
 
+        System.out.println("Welcome, " + user.getName() + "!");
         RegularUser regularUser = (RegularUser) user;
 
         while (true) {

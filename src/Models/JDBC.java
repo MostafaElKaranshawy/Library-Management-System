@@ -11,9 +11,9 @@ public class JDBC {
         try {
 
             Dotenv dotenv = Dotenv.load();
-            String dbUrl = dotenv.get("db_url");
-            String dbUser = dotenv.get("db_username");
-            String dbPassword = dotenv.get("db_password");
+            String dbUrl = dotenv.get("DB_URL");
+            String dbUser = dotenv.get("DP_USERNAME");
+            String dbPassword = dotenv.get("DB_PASSWORD");
 
             connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
 

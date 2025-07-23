@@ -3,10 +3,11 @@ package Services;
 import Interfaces.Identifiable;
 import Interfaces.Nameable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchService<T> {
+public class SearchService<T> implements Serializable {
 
     public T searchById(String id, List<T> items) {
         for (T item : items) {

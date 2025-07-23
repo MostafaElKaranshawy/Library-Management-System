@@ -6,6 +6,7 @@ import Models.RegularUser;
 import Models.User;
 
 import javax.management.InstanceNotFoundException;
+import java.io.File;
 import java.util.*;
 
 public class BooksService {
@@ -20,20 +21,34 @@ public class BooksService {
         books = new HashMap<>();
         genres = new HashSet<>();
 
-        // Add some initial books
+        if(ConfigService.useFileStorage())
+            fetchBooksFromFile();
+        else
+            fetchBooks();
+    }
+    private static void fetchBooksFromFile() {
+        try {
+            List<Book> initialBooks = FileService.getAllBooks();
+            for (Book book : initialBooks) {
+                books.put(book.getId(), book);
+                genres.add(book.getGenre());
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+    private static void fetchBooks() {
         try {
             List<Book> initialBooks = DBService.getAllBooks();
             for (Book book : initialBooks) {
                 books.put(book.getId(), book);
                 genres.add(book.getGenre());
             }
-
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
-
     public static void addBook(String title, String author, String genre, int copies) throws Exception {
         if (title == null || author == null || genre == null || copies <= 0) {
             throw new RuntimeException("Invalid book details");
@@ -45,7 +60,10 @@ public class BooksService {
             } while (books.containsKey(id));
             Book book = new Book(id, title, author, genre, copies);
             books.put(id, book);
-            DBService.addBook(book);
+            if(ConfigService.useFileStorage())
+                FileService.addBook(book);
+            else
+                DBService.addBook(book);
         }
         catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -56,7 +74,10 @@ public class BooksService {
         if (books.containsKey(id)) {
             books.remove(id);
             try {
-                DBService.deleteBook(id);
+                if(ConfigService.useFileStorage())
+                    FileService.deleteBook(id);
+                else
+                    DBService.deleteBook(id);
             } catch (Exception e) {
                 throw new RuntimeException("Error removing book from database: " + e.getMessage());
             }
@@ -68,7 +89,10 @@ public class BooksService {
         if (books.containsKey(book.getId())) {
             books.put(book.getId(), book);
             try {
-                DBService.updateBook(book);
+                if(ConfigService.useFileStorage())
+                    FileService.updateBook(book);
+                else
+                    DBService.updateBook(book);
             } catch (Exception e) {
                 throw new RuntimeException("Error updating book in database: " + e.getMessage());
             }
@@ -85,7 +109,10 @@ public class BooksService {
             try {
                 user.borrowBook(book);
                 book.borrowBook();
-                DBService.borrowBook(user.getId(), bookId);
+                if(ConfigService.useFileStorage())
+                    FileService.borrowBook(user.getId(), bookId);
+                else
+                    DBService.borrowBook(user.getId(), bookId);
                 return book;
             }
             catch (Exception e) {
@@ -104,8 +131,14 @@ public class BooksService {
             try {
                 user.returnBook(book);
                 book.returnBook();
-                DBService.returnBook(user.getId(), bookId);
-                DBService.updateBook(book);
+                if (ConfigService.useFileStorage()) {
+                    FileService.returnBook(user.getId(), bookId);
+                    FileService.updateBook(book);
+                }
+                else {
+                    DBService.returnBook(user.getId(), bookId);
+                    DBService.updateBook(book);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage());
             }
@@ -116,8 +149,14 @@ public class BooksService {
             } else {
                 try {
                     BooksService.addBook(newBook.getTitle(), newBook.getAuthor(), newBook.getGenre(), 1);
-                    DBService.returnBook(user.getId(), bookId);
-                    DBService.addBook(newBook);
+                    if(ConfigService.useFileStorage()) {
+                        FileService.returnBook(user.getId(), bookId);
+                        FileService.addBook(newBook);
+                    }
+                    else{
+                        DBService.returnBook(user.getId(), bookId);
+                        DBService.addBook(newBook);
+                    }
                 }
                 catch (Exception e1) {
                     throw new RuntimeException("Book not found in the system");

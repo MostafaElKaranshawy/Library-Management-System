@@ -3,10 +3,11 @@ package Models;
 import Interfaces.Identifiable;
 import Interfaces.Nameable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User implements Identifiable, Nameable {
+public class User implements Identifiable, Nameable, Serializable {
     private String id;
     private String name;
     private String role;
