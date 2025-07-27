@@ -28,6 +28,33 @@ A Library Management System CLI Application.
 <img width="952" height="625" alt="image" src="https://github.com/user-attachments/assets/81fd0a6b-14db-46c2-86bf-b821327ec405" />
 
 
+## How to Run
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/MostafaElKaranshawy/Library-Management-System.git
+cd ./Library-Management-System.git
+```
+
+### 2. Install Dependencies
+
+- Java JDK (23).
+- MySQL Connector.
+  - Add the .jar file into your project structure.
+- io.github.cdimascio.dotenv.java
+- codenameone.sqlite.jdbc
+- mindrot.jbcrypt
+
+### 3. Run the Code
+
+```bash
+javac -d out src/*.java
+java -cp out src/Main.java
+```
+
+### Now Your Program Is Ready To Use.
+
 
 ## System Snapshots 
 
