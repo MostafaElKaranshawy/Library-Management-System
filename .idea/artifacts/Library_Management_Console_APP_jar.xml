@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Library_Management_Console_APP:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Library_Management_Console_APP_jar</output-path>
+    <root id="archive" name="Library_Management_Console_APP.jar">
+      <element id="module-output" name="Library_Management_Console_APP" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/dotenv-java-3.2.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jbcrypt-0.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/mysql-connector-j-9.3.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/sqlite-jdbc-7.0.182.jar" path-in-jar="/" />
+      <element id="module-source" name="Library_Management_Console_APP" />
+    </root>
+  </artifact>
+</component>

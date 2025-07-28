@@ -78,6 +78,7 @@ public class SystemService {
                 FileService.addUser(newUser);
             else
                 DBService.addUser(newUser);
+                DBService.addRegularUser(newUser);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());

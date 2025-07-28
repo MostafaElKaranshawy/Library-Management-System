@@ -61,7 +61,19 @@ public class DBService {
             var preparedStatement = JDBC.connection.prepareStatement(query);
             preparedStatement.setString(1, user.getId());
             preparedStatement.setString(2, user.getName());
-            preparedStatement.setString(3, user.getRole());
+            preparedStatement.setString(3, "regular");
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void addRegularUser(RegularUser user) {
+        String query = "INSERT INTO regular_users (id, address, phone_number) VALUES (?, ?, ?)";
+        try {
+            var preparedStatement = JDBC.connection.prepareStatement(query);
+            preparedStatement.setString(1, user.getId());
+            preparedStatement.setString(2, user.getAddress());
+            preparedStatement.setString(3, user.getPhoneNumber());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
