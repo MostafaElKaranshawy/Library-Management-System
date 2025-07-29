@@ -1,6 +1,29 @@
 # Library Management System
 A Library Management System CLI Application.
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [System Functionalities](#system-functionalities)
+- [Database Schema](#database-schema)
+- [Entities Class Diagram](#entities-class-diagram)
+- [How to Run](#how-to-run)
+  - [Clone the Repository](#1-clone-the-repository)
+  - [Install Dependencies](#2-install-dependencies)
+  - [Run the Code](#3-run-the-code)
+- [How to Run (Docker Version)](#how-to-run-docker-version)
+  - [Clone the Repository](#1-clone-the-repository-1)
+  - [Install Docker for Your System](#2-install-docker-for-your-system)
+  - [Check for Your .env File](#3-check-for-your-env-file)
+  - [Run the Docker Compose to Build and Run the Containers](#4-run-the-docker-compose-to-build-and-run-the-containers)
+  - [Access the Application](#5-access-the-application)
+  - [Troubleshooting Tips](#troubleshooting-tips)
+- [System Snapshots](#system-snapshots)
+
+# Introduction
+
+This is a simple Library Management System that allows users to borrow and return books, while providing an admin interface for managing users and books and a user UI to borrow or return books.
+
 ## System Functionalities
 
 - Admin Authentication
@@ -55,6 +78,71 @@ java -cp out src/Main.java
 
 ### Now Your Program Is Ready To Use.
 
+## How to Run (Docker Version)
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/MostafaElKaranshawy/Library-Management-System.git
+cd ./Library-Management-System.git
+```
+
+### 2. install docker for your system
+- [Docker Installation Guide](https://docs.docker.com/get-docker/)
+
+### 3. Check for your .env file 
+
+```bash
+DP_USERNAME=your_db_username
+DB_PASSWORD=your_db_password
+DB_HOST=mysql
+DB_URL=jdbc:mysql://mysql:3306/library_system
+FILES_PATH=path_to_your_files
+```
+
+
+### 4. Run the Docker Compose to build and run the containers
+
+- Make sure that the `app.jar` file is in the root directory of the project.
+  ```bash
+  docker compose up --build
+  ```
+- To check that the containers are running, you can use:
+
+  ```bash
+  docker ps
+  ```
+### 5. Access the Application.
+- my_app:
+  
+  ```bash
+  docker ps
+  # Copy you my_app container ID
+  docker attach <container_id>
+  # you will see the application running in your terminal.
+  ```
+
+<hr>
+
+- Adminer
+  - open your browser and go to `http://localhost:8080`
+  - set the server to `mysql`
+  - set the username to your database username
+  - set the password to your database password
+  - set the database to `library_system`
+  - login to see your database.
+<hr>
+
+### Troubleshooting Tips
+
+- If you encounter issues with the database connection, ensure that your `.env` file is correctly configured with the right credentials and database URL.
+- If you face any issues with Docker, make sure Docker is running and that you have the necessary permissions to run Docker commands (maybe you need to use `sudo` before docker commands).
+- for any other issues, check the docker documentation or the issues section of this repository [Docker Installation Guide](https://docs.docker.com/get-docker/).
+- If you need to stop the containers, you can use:
+
+  ```bash
+  docker compose down
+  ```
 
 ## System Snapshots 
 
