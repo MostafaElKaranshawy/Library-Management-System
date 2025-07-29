@@ -24,6 +24,8 @@ A Library Management System CLI Application.
 
 This is a simple Library Management System that allows users to borrow and return books, while providing an admin interface for managing users and books and a user UI to borrow or return books.
 
+<hr>
+
 ## System Functionalities
 
 - Admin Authentication
@@ -42,14 +44,20 @@ This is a simple Library Management System that allows users to borrow and retur
   - File System database
   - MySQL Database.
 
+<hr>
+
 ## Database Schema
 
 <img width="790" height="625" alt="image" src="https://github.com/user-attachments/assets/862a0e47-6b65-4aa2-96f1-d175483b31ff" />
+
+<hr>
 
 ## Entities Class Diagram
 
 <img width="952" height="625" alt="image" src="https://github.com/user-attachments/assets/81fd0a6b-14db-46c2-86bf-b821327ec405" />
 
+
+<hr>
 
 ## How to Run
 
@@ -143,6 +151,8 @@ FILES_PATH=path_to_your_files
   ```bash
   docker compose down
   ```
+
+<hr>
 
 ## System Snapshots 
 
