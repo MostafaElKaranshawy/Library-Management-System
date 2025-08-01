@@ -1,0 +1,22 @@
+services:
+  mysql:
+    image: mysql
+    volumes:
+      - /var/mysql:/var/lib/mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+  my_app:
+    build: .
+    env_file: .env
+    stdin_open: true
+    tty: true
+    depends_on:
+      - mysql

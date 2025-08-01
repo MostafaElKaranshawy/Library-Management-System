@@ -52,4 +52,16 @@ public class RegularUser extends User {
     public void setBorrowedBooks(List<Book> borrowedBooks) {
         this.borrowedBooks = borrowedBooks;
     }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public SearchService<Book> getUserBooksSearchService() {
+        return userBooksSearchService;
+    }
 }
